@@ -2,6 +2,7 @@ package router_test
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 
@@ -9,7 +10,6 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/golang/mock/gomock"
-	"github.com/reverted/logger"
 	"github.com/reverted/router"
 	"github.com/reverted/router/mocks"
 )
@@ -34,10 +34,7 @@ var _ = Describe("Handler", func() {
 		mockHandler = mocks.NewMockHandler(mockCtrl)
 
 		handler = router.NewHandler(
-			logger.New("test",
-				logger.Writer(GinkgoWriter),
-				logger.Level(logger.Debug),
-			),
+			newLogger(),
 			mockRouter,
 			mockHandler,
 		)
@@ -82,3 +79,13 @@ var _ = Describe("Handler", func() {
 		})
 	})
 })
+
+func newLogger() *logger {
+	return &logger{}
+}
+
+type logger struct{}
+
+func (self *logger) Error(args ...interface{}) {
+	fmt.Fprintln(GinkgoWriter, args...)
+}
